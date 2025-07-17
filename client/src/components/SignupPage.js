@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-function SignupPage() {
+function SignupPage({ auth, role }) {
   const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'employee' });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -18,7 +19,8 @@ function SignupPage() {
       const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/register`, formData);
       console.log('Signup response:', res.data);
       if (res.data && res.data.token && res.data.employee) {
-        localStorage.setItem('token', res.data.token);
+        setSuccess('User registered successfully');
+        setError('');
         navigate('/dashboard');
       } else {
         setError('Invalid response from server');
@@ -26,12 +28,14 @@ function SignupPage() {
     } catch (err) {
       console.error('Signup error:', err);
       setError(err.response?.data?.msg || 'An error occurred');
+      setSuccess('');
     }
   };
 
   return (
     <div className="signup-container">
       <h2>Sign Up</h2>
+      {success && <p className="success">{success}</p>}
       {error && <p className="error">{error}</p>}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
@@ -46,13 +50,15 @@ function SignupPage() {
           <label>Password:</label>
           <input type="password" name="password" value={formData.password} onChange={handleChange} required />
         </div>
-        <div className="form-group">
-          <label>Role:</label>
-          <select name="role" value={formData.role} onChange={handleChange} required>
-            <option value="employee">Employee</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
+        {auth && role === 'admin' && (
+          <div className="form-group">
+            <label>Role:</label>
+            <select name="role" value={formData.role} onChange={handleChange} required>
+              <option value="employee">Employee</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+        )}
         <button type="submit">Sign Up</button>
       </form>
     </div>

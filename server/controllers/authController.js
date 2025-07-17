@@ -12,6 +12,17 @@ exports.register = async (req, res) => {
       return res.status(400).json({ msg: 'User already exists' });
     }
 
+    // Check if the user is an admin and can create another admin
+    const token = req.header('x-auth-token');
+    if (token) {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const requestingUser = await Employee.findById(decoded.employee.id);
+
+      if (requestingUser.role !== 'admin' && role === 'admin') {
+        return res.status(403).json({ msg: 'Forbidden: Only admins can create other admins' });
+      }
+    }
+
     employee = new Employee({
       name,
       email,

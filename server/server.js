@@ -17,6 +17,7 @@ app.use(express.json({ extended: false }));
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/employees', jwtUtils, require('./routes/employeeRoutes')); // Use jwtUtils middleware
 app.use('/api/leaves', jwtUtils, require('./routes/leaveRoutes')); // Use jwtUtils middleware
+app.use('/api/reports', jwtUtils, require('./routes/reportRoutes')); // Use jwtUtils middleware
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static('client/build'));

@@ -3,13 +3,16 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from './components/Navbar';
 import LoginPage from './components/LoginPage';
-import SignupPage from './components/SignupPage'; // Import SignupPage
+import SignupPage from './components/SignupPage';
 import EmployeeDashboard from './components/EmployeeDashboard';
 import ApplyForLeave from './components/ApplyForLeave';
 import LeaveHistory from './components/LeaveHistory';
 import AdminDashboard from './components/AdminDashboard';
 import EmployeeManagement from './components/EmployeeManagement';
+import LeaveManagement from './components/LeaveManagement';
 import Reports from './components/Reports';
+import Notifications from './components/Notifications';
+import AccountSettings from './components/AccountSettings';
 
 function App() {
   const [auth, setAuth] = useState(false);
@@ -45,17 +48,20 @@ function App() {
 
   return (
     <Router>
-      <Navbar auth={auth} handleLogout={handleLogout} />
+      <Navbar auth={auth} role={role} handleLogout={handleLogout} />
       <div className="container">
         <Routes>
           <Route path="/" element={<LoginPage handleLogin={handleLogin} />} />
-          <Route path="/signup" element={<SignupPage />} /> {/* Add SignupPage route */}
+          <Route path="/signup" element={<SignupPage auth={auth} role={role} />} /> {/* Pass auth and role props */}
           <Route path="/dashboard" element={auth ? <EmployeeDashboard /> : <LoginPage handleLogin={handleLogin} />} />
           <Route path="/apply-leave" element={auth ? <ApplyForLeave /> : <LoginPage handleLogin={handleLogin} />} />
           <Route path="/leave-history" element={auth ? <LeaveHistory /> : <LoginPage handleLogin={handleLogin} />} />
           <Route path="/admin-dashboard" element={auth && role === 'admin' ? <AdminDashboard /> : <LoginPage handleLogin={handleLogin} />} />
           <Route path="/employee-management" element={auth && role === 'admin' ? <EmployeeManagement /> : <LoginPage handleLogin={handleLogin} />} />
+          <Route path="/leave-management" element={auth && role === 'admin' ? <LeaveManagement /> : <LoginPage handleLogin={handleLogin} />} />
           <Route path="/reports" element={auth && role === 'admin' ? <Reports /> : <LoginPage handleLogin={handleLogin} />} />
+          <Route path="/notifications" element={auth && role === 'admin' ? <Notifications /> : <LoginPage handleLogin={handleLogin} />} />
+          <Route path="/account-settings" element={auth && role === 'admin' ? <AccountSettings handleLogout={handleLogout} /> : <LoginPage handleLogin={handleLogin} />} />
         </Routes>
       </div>
     </Router>

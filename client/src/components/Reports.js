@@ -1,66 +1,78 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Bar } from 'react-chartjs-2';
+import { Bar, Doughnut } from 'react-chartjs-2';
+import Chart from 'chart.js/auto'; // Import Chart.js automatically
 
 function Reports() {
-  const [leaves, setLeaves] = useState([]);
-  const [stats, setStats] = useState({ totalRequests: 0, approved: 0, rejected: 0 });
+  const [monthlyLeaves, setMonthlyLeaves] = useState([]);
+  const [departmentLeaves, setDepartmentLeaves] = useState([]);
 
   useEffect(() => {
-    const fetchLeaves = async () => {
+    const fetchMonthlyLeaves = async () => {
       try {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/leaves`);
-        setLeaves(res.data);
+        const monthlyData = Array.from({ length: 12 }, (_, i) => ({
+          month: i + 1,
+          count: res.data.filter(l => new Date(l.startDate).getMonth() === i).length,
+        }));
+        setMonthlyLeaves(monthlyData);
       } catch (err) {
         console.error(err);
       }
     };
 
-    const fetchStats = async () => {
+    const fetchDepartmentLeaves = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/leaves`);
-        const totalRequests = res.data.length;
-        const approved = res.data.filter(l => l.status === 'approved').length;
-        const rejected = res.data.filter(l => l.status === 'rejected').length;
-        setStats({ totalRequests, approved, rejected });
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/employees`);
+        const departmentData = res.data.map(emp => ({
+          name: emp.name,
+          leaves: emp.leaves.filter(l => l.status === 'approved').length,
+        }));
+        setDepartmentLeaves(departmentData);
       } catch (err) {
         console.error(err);
       }
     };
 
-    fetchLeaves();
-    fetchStats();
+    fetchMonthlyLeaves();
+    fetchDepartmentLeaves();
   }, []);
 
-  const data = {
-    labels: ['Approved', 'Rejected'],
+  const monthlyLeavesData = {
+    labels: monthlyLeaves.map(m => new Date(0, m.month - 1).toLocaleString('default', { month: 'long' })),
     datasets: [
       {
-        label: 'Leave Status',
-        data: [stats.approved, stats.rejected],
-        backgroundColor: ['#28a745', '#dc3545'],
+        label: 'Monthly Leaves',
+        data: monthlyLeaves.map(m => m.count),
+        backgroundColor: '#457b9dff',
+      },
+    ],
+  };
+
+  const departmentLeavesData = {
+    labels: departmentLeaves.map(d => d.name),
+    datasets: [
+      {
+        label: 'Department-wise Leaves',
+        data: departmentLeaves.map(d => d.leaves),
+        backgroundColor: '#a8dadcff',
       },
     ],
   };
 
   return (
     <div>
-      <h2>Reports</h2>
-      <div className="summary-cards">
-        <div className="card">
-          <h3>Total Requests</h3>
-          <p>{stats.totalRequests}</p>
+      <h2>Reports & Analytics</h2>
+      <div className="charts">
+        <div className="chart-container">
+          <h3>Monthly Leaves</h3>
+          <Doughnut data={monthlyLeavesData} />
         </div>
-        <div className="card">
-          <h3>Approved</h3>
-          <p>{stats.approved}</p>
-        </div>
-        <div className="card">
-          <h3>Rejected</h3>
-          <p>{stats.rejected}</p>
+        <div className="chart-container">
+          <h3>Department-wise Leaves</h3>
+          <Bar data={departmentLeavesData} />
         </div>
       </div>
-      <Bar data={data} />
     </div>
   );
 }

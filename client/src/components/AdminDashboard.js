@@ -1,47 +1,52 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Bar } from 'react-chartjs-2';
+import { Doughnut, Bar } from 'react-chartjs-2';
 
 function AdminDashboard() {
-  const [leaves, setLeaves] = useState([]);
   const [stats, setStats] = useState({ totalEmployees: 0, leavesThisMonth: 0, approved: 0, pending: 0, rejected: 0 });
+  const [recentActivity, setRecentActivity] = useState([]);
 
   useEffect(() => {
-    const fetchLeaves = async () => {
-      try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/leaves`);
-        setLeaves(res.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
     const fetchStats = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/employees`);
-        const totalEmployees = res.data.length;
-        const now = new Date();
-        const leavesThisMonth = res.data.reduce((acc, emp) => acc + emp.leaves.filter(l => l.startDate.getMonth() === now.getMonth() && l.startDate.getFullYear() === now.getFullYear()).length, 0);
-        const approved = res.data.reduce((acc, emp) => acc + emp.leaves.filter(l => l.status === 'approved').length, 0);
-        const pending = res.data.reduce((acc, emp) => acc + emp.leaves.filter(l => l.status === 'pending').length, 0);
-        const rejected = res.data.reduce((acc, emp) => acc + emp.leaves.filter(l => l.status === 'rejected').length, 0);
-        setStats({ totalEmployees, leavesThisMonth, approved, pending, rejected });
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/reports`);
+        setStats(res.data);
       } catch (err) {
         console.error(err);
       }
     };
 
-    fetchLeaves();
+    const fetchRecentActivity = async () => {
+      try {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/leaves`);
+        setRecentActivity(res.data.slice(0, 5)); // Get the last 5 leave requests
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
     fetchStats();
+    fetchRecentActivity();
   }, []);
 
-  const data = {
+  const leaveStatusData = {
     labels: ['Approved', 'Pending', 'Rejected'],
     datasets: [
       {
         label: 'Leave Status',
         data: [stats.approved, stats.pending, stats.rejected],
         backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+      },
+    ],
+  };
+
+  const recentActivityData = {
+    labels: recentActivity.map(leave => `${leave.employeeId} (${leave.leaveType})`),
+    datasets: [
+      {
+        label: 'Recent Activity',
+        data: recentActivity.map(leave => leave.status === 'approved' ? 1 : leave.status === 'pending' ? 2 : 3),
+        backgroundColor: recentActivity.map(leave => leave.status === 'approved' ? '#28a745' : leave.status === 'pending' ? '#ffc107' : '#dc3545'),
       },
     ],
   };
@@ -71,7 +76,16 @@ function AdminDashboard() {
           <p>{stats.rejected}</p>
         </div>
       </div>
-      <Bar data={data} />
+      <div className="charts">
+        <div className="chart-container">
+          <h3>Leave Status</h3>
+          <Doughnut data={leaveStatusData} />
+        </div>
+        <div className="chart-container">
+          <h3>Recent Activity</h3>
+          <Bar data={recentActivityData} />
+        </div>
+      </div>
     </div>
   );
 }

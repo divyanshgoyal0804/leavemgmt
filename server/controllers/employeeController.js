@@ -30,6 +30,17 @@ exports.addEmployee = async (req, res) => {
       return res.status(400).json({ msg: 'User already exists' });
     }
 
+    // Check if the user is an admin and can create another admin
+    const token = req.header('x-auth-token');
+    if (token) {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const requestingUser = await Employee.findById(decoded.employee.id);
+
+      if (requestingUser.role !== 'admin' && role === 'admin') {
+        return res.status(403).json({ msg: 'Forbidden: Only admins can create other admins' });
+      }
+    }
+
     employee = new Employee({
       name,
       email,
@@ -44,7 +55,21 @@ exports.addEmployee = async (req, res) => {
 
     await employee.save();
 
-    res.json(employee);
+    const payload = {
+      employee: {
+        id: employee.id,
+      },
+    };
+
+    jwt.sign(
+      payload,
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' },
+      (err, token) => {
+        if (err) throw err;
+        res.json({ token, employee }); // Return employee details
+      }
+    );
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
