@@ -1,0 +1,153 @@
+/* Global Styles */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--honeydew);
+  color: var(--berkeley-blue);
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--cerulean);
+  color: var(--honeydew);
+  padding: 1rem;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  text-decoration: none;
+  color: var(--honeydew);
+}
+
+.navbar-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.navbar-links a {
+  color: var(--honeydew);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.navbar-links a:hover {
+  background-color: var(--non-photo-blue);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--cerulean);
+  border-radius: 5px;
+}
+
+.form-group button {
+  padding: 0.5rem 1rem;
+  background-color: var(--red-pantone);
+  color: var(--honeydew);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.form-group button:hover {
+  background-color: var(--non-photo-blue);
+}
+
+.table-container {
+  margin-top: 2rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+th, td {
+  border: 1px solid var(--cerulean);
+  padding: 0.5rem;
+  text-align: left;
+}
+
+th {
+  background-color: var(--cerulean);
+  color: var(--honeydew);
+}
+
+.summary-cards {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.card {
+  background-color: var(--non-photo-blue);
+  padding: 1rem;
+  border-radius: 5px;
+  flex: 1;
+}
+
+.card h3 {
+  margin: 0 0 0.5rem 0;
+}
+
+.card p {
+  margin: 0;
+}
+
+.dashboard-links {
+  margin-top: 1rem;
+}
+
+.dashboard-links a {
+  display: inline-block;
+  margin-right: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--cerulean);
+  color: var(--honeydew);
+  border-radius: 5px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.dashboard-links a:hover {
+  background-color: var(--non-photo-blue);
+}
+
+.login-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: var(--non-photo-blue);
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.error {
+  color: var(--red-pantone);
+  margin-bottom: 1rem;
+}
