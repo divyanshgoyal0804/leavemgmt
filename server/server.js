@@ -12,6 +12,8 @@ app.use(cors());
 
 connectDB();
 
+
+
 app.use(express.json({ extended: false }));
 
 app.use('/api/auth', require('./routes/authRoutes'));
@@ -30,3 +32,8 @@ if (process.env.NODE_ENV === 'production') {
 const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+
+console.log("Backend app starting, PORT:", process.env.PORT);
+console.log("Trying to connect to Mongo at:", process.env.MONGO_URI);
+
